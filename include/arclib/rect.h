@@ -27,6 +27,7 @@
 
 #include "concepts.h"
 #include "vec2.h"
+#include <array>
 
 namespace arcl {
 
@@ -36,8 +37,9 @@ namespace arcl {
 
     /// <summary>
     /// arcl::rect holds four values representing an axis-aligned rectangle.
-    /// arclib operations treat it as canonically oriented to x-right and y-up. However,
-    /// the user is free to use it as a POD type.
+    /// arclib operations treat it as canonically oriented to x-right and y-up. The width
+    /// and height values must also be positive. However, the user is free to use it as a
+    /// POD type with no invariant.
     /// </summary>
     template <floating_t T>
     struct rect {
@@ -145,6 +147,26 @@ namespace arcl {
     }
 
     /// <summary>
+    /// Splits the rectangle into its 4 quadrants.
+    /// </summary>
+    /// <param name="r">The rectangle.</param>
+    /// <returns>An array containing the quadrants in clockwise order starting from the
+    /// top-left quadrant.</returns>
+    template <floating_t T>
+    constexpr std::array<rect<T>, 4> rect_split4(const rect<T>& r) {
+        std::array<rect<T>, 4> result;
+        const T half_w = r.w / 2;
+        const T half_h = r.h / 2;
+        const T mid_x = r.x + half_w;
+        const T mid_y = r.y + half_h;
+        result[0] = { r.x, mid_y, half_w, half_h };
+        result[1] = { mid_x, mid_y, half_w, half_h };
+        result[2] = { mid_x, r.y, half_w, half_h };
+        result[3] = { r.x, r.y, half_w, half_h };
+        return result;
+    }
+
+    /// <summary>
     /// Checks if a point is contained within the rectangle.
     /// </summary>
     /// <param name="r">The rectangle.</param>
@@ -187,7 +209,7 @@ namespace arcl {
     /// <param name="r2">The second rectangle.</param>
     /// <returns>true if the rectangles intersect, else false.</returns>
     template <floating_t T>
-    constexpr bool intersect(const rect<T>& r1, const rect<T>& r2) {
+    constexpr bool intersects(const rect<T>& r1, const rect<T>& r2) {
         return rect_left(r1) <= rect_right(r2) && rect_left(r2) <= rect_right(r1)
                && rect_bot(r1) <= rect_top(r2) && rect_bot(r2) <= rect_top(r1);
     }
