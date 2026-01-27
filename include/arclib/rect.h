@@ -27,6 +27,7 @@
 
 #include "concepts.h"
 #include "vec2.h"
+#include <algorithm>
 #include <array>
 
 namespace arcl {
@@ -226,6 +227,19 @@ namespace arcl {
     template <floating_t T, floating_t U>
     constexpr rect<T> rect_cast(const rect<U>& r) {
         return { (T)r.x, (T)r.y, (T)r.w, (T)r.h };
+    }
+
+    /// <summary>
+    /// Constructs a rect from two points.
+    /// </summary>
+    /// <param name="a">The first point.</param>
+    /// <param name="b">The second point.</param>
+    /// <returns>The constructed rect.</returns>
+    template <floating_t T>
+    constexpr rect<T> rect_construct(const vec2<T>& a, const vec2<T>& b) {
+        T x = std::min(a.x, b.x);
+        T y = std::min(a.y, b.y);
+        return { x, y, std::max(a.x, b.x) - x, std::max(a.y, b.y) - y };
     }
 
 }
