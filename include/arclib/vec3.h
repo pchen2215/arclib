@@ -61,14 +61,14 @@ namespace arcl {
     }
 
     // Scalar multiplication assignment operator
-    template <floating_t T>
-    constexpr vec3<T>& operator*=(vec3<T>& v, T k) {
+    template <floating_t T, arithmetic_t U>
+    constexpr vec3<T>& operator*=(vec3<T>& v, U k) {
         v = v * k; return v;
     }
 
     // Scalar division assignment operator
-    template <floating_t T>
-    constexpr vec3<T>& operator/=(vec3<T>& v, T k) {
+    template <floating_t T, arithmetic_t U>
+    constexpr vec3<T>& operator/=(vec3<T>& v, U k) {
         v = v / k; return v;
     }
 
@@ -89,20 +89,20 @@ namespace arcl {
     }
 
     // Scalar multiplication operator
-    template <floating_t T>
-    constexpr vec3<T> operator*(T k, const vec3<T>& v) {
+    template <floating_t T, arithmetic_t U>
+    constexpr vec3<T> operator*(const vec3<T>& v, U k) {
         return { k * v.x, k * v.y, k * v.z };
     }
 
     // Scalar multiplication operator
-    template <floating_t T>
-    constexpr vec3<T> operator*(const vec3<T>& v, T k) {
-        return k * v;
+    template <floating_t T, arithmetic_t U>
+    constexpr vec3<T> operator*(U k, const vec3<T>& v) {
+        return v * k;
     }
 
     // Scalar division operator
-    template <floating_t T>
-    constexpr vec3<T> operator/(const vec3<T>& v, T k) {
+    template <floating_t T, arithmetic_t U>
+    constexpr vec3<T> operator/(const vec3<T>& v, U k) {
         return { v.x / k, v.y / k, v.z / k };
     }
     
