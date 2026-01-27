@@ -51,25 +51,37 @@ namespace arcl {
     // Vector addition assignment operator
     template <floating_t T>
     constexpr vec3<T>& operator+=(vec3<T>& a, const vec3<T>& b) {
-        a = a + b; return a;
+        a.x += b.x;
+        a.y += b.y;
+        a.z += b.z;
+        return a;
     }
 
     // Vector subtraction assignment operator
     template <floating_t T>
     constexpr vec3<T>& operator-=(vec3<T>& a, const vec3<T>& b) {
-        a = a - b; return a;
+        a.x -= b.x;
+        a.y -= b.y;
+        a.z -= b.z;
+        return a;
     }
 
     // Scalar multiplication assignment operator
     template <floating_t T, arithmetic_t U>
     constexpr vec3<T>& operator*=(vec3<T>& v, U k) {
-        v = v * k; return v;
+        v.x *= k;
+        v.y *= k;
+        v.z *= k;
+        return v;
     }
 
     // Scalar division assignment operator
     template <floating_t T, arithmetic_t U>
     constexpr vec3<T>& operator/=(vec3<T>& v, U k) {
-        v = v / k; return v;
+        v.x /= k;
+        v.y /= k;
+        v.z /= k;
+        return v;
     }
 
 // =======================================================================================
@@ -78,32 +90,32 @@ namespace arcl {
 
     // Vector addition operator
     template <floating_t T>
-    constexpr vec3<T> operator+(const vec3<T>& a, const vec3<T>& b) {
-        return { a.x + b.x, a.y + b.y, a.z + b.z };
+    constexpr vec3<T> operator+(vec3<T> a, const vec3<T>& b) {
+        return a += b;
     }
 
     // Vector subtraction operator
     template <floating_t T>
-    constexpr vec3<T> operator-(const vec3<T>& a, const vec3<T>& b) {
-        return a + -b;
+    constexpr vec3<T> operator-(vec3<T> a, const vec3<T>& b) {
+        return a -= b;
     }
 
     // Scalar multiplication operator
     template <floating_t T, arithmetic_t U>
-    constexpr vec3<T> operator*(const vec3<T>& v, U k) {
-        return { k * v.x, k * v.y, k * v.z };
+    constexpr vec3<T> operator*(vec3<T> v, U k) {
+        return v *= k;
     }
 
     // Scalar multiplication operator
     template <floating_t T, arithmetic_t U>
-    constexpr vec3<T> operator*(U k, const vec3<T>& v) {
-        return v * k;
+    constexpr vec3<T> operator*(U k, vec3<T> v) {
+        return v *= k;
     }
 
     // Scalar division operator
     template <floating_t T, arithmetic_t U>
-    constexpr vec3<T> operator/(const vec3<T>& v, U k) {
-        return { v.x / k, v.y / k, v.z / k };
+    constexpr vec3<T> operator/(vec3<T> v, U k) {
+        return v /= k;
     }
     
     // Negation operator

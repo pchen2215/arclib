@@ -50,25 +50,33 @@ namespace arcl {
     // Vector addition assignment operator
     template <floating_t T>
     constexpr vec2<T>& operator+=(vec2<T>& a, const vec2<T>& b) {
-        a = a + b; return a;
+        a.x += b.x;
+        a.y += b.y;
+        return a;
     }
 
     // Vector subtraction assignment operator
     template <floating_t T>
     constexpr vec2<T>& operator-=(vec2<T>& a, const vec2<T>& b) {
-        a = a - b; return a;
+        a.x -= b.x;
+        a.y -= b.y;
+        return a;
     }
 
     // Scalar multiplication assignment operator
     template <floating_t T, arithmetic_t U>
     constexpr vec2<T>& operator*=(vec2<T>& v, U k) {
-        v = v * k; return v;
+        v.x *= k;
+        v.y *= k;
+        return v;
     }
 
     // Scalar division assignment operator
     template <floating_t T, arithmetic_t U>
     constexpr vec2<T>& operator/=(vec2<T>& v, U k) {
-        v = v / k; return v;
+        v.x /= k;
+        v.y /= k;
+        return v;
     }
 
 // =======================================================================================
@@ -77,32 +85,32 @@ namespace arcl {
 
     // Vector addition operator
     template <floating_t T>
-    constexpr vec2<T> operator+(const vec2<T>& a, const vec2<T>& b) {
-        return { a.x + b.x, a.y + b.y };
+    constexpr vec2<T> operator+(vec2<T> a, const vec2<T>& b) {
+        return a += b;
     }
 
     // Vector subtraction operator
     template <floating_t T>
-    constexpr vec2<T> operator-(const vec2<T>& a, const vec2<T>& b) {
-        return a + -b;
+    constexpr vec2<T> operator-(vec2<T> a, const vec2<T>& b) {
+        return a -= b;
     }
 
     // Scalar multiplication operator
     template <floating_t T, arithmetic_t U>
-    constexpr vec2<T> operator*(const vec2<T>& v, U k) {
-        return { k * v.x, k * v.y };
+    constexpr vec2<T> operator*(vec2<T> v, U k) {
+        return v *= k;
     }
 
     // Scalar multiplication operator
     template <floating_t T, arithmetic_t U>
-    constexpr vec2<T> operator*(U k, const vec2<T>& v) {
-        return v * k;
+    constexpr vec2<T> operator*(U k, vec2<T> v) {
+        return v *= k;
     }
 
     // Scalar division operator
     template <floating_t T, arithmetic_t U>
-    constexpr vec2<T> operator/(const vec2<T>& v, U k) {
-        return { v.x / k, v.y / k };
+    constexpr vec2<T> operator/(vec2<T> v, U k) {
+        return v /= k;
     }
     
     // Negation operator
