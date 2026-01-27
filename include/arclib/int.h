@@ -29,13 +29,14 @@
 
 namespace arcl {
 
-    using int8   = std::int8_t;   // 8-bit signed int
+    using int8  = std::int8_t;  // 8-bit signed int
+    using int16 = std::int16_t; // 16-bit signed int
+    using int32 = std::int32_t; // 32-bit signed int
+    using int64 = std::int64_t; // 64-bit signed int
+
     using uint8  = std::uint8_t;  // 8-bit unsigned int
-    using int16  = std::int16_t;  // 16-bit signed int
     using uint16 = std::uint16_t; // 16-bit unsigned int
-    using int32  = std::int32_t;  // 32-bit signed int
     using uint32 = std::uint32_t; // 32-bit unsigned int
-    using int64  = std::int64_t;  // 64-bit signed int
     using uint64 = std::uint64_t; // 64-bit unsigned int
 
 }
