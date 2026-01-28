@@ -34,7 +34,7 @@ namespace arcl {
 // vec2 STRUCT DEFINITION
 // =======================================================================================
 
-    template <floating_t T>
+    template <floating T>
     struct vec2 {
         T x = 0;
         T y = 0;
@@ -48,7 +48,7 @@ namespace arcl {
 // =======================================================================================
 
     // Vector addition assignment operator
-    template <floating_t T>
+    template <floating T>
     constexpr vec2<T>& operator+=(vec2<T>& a, const vec2<T>& b) {
         a.x += b.x;
         a.y += b.y;
@@ -56,7 +56,7 @@ namespace arcl {
     }
 
     // Vector subtraction assignment operator
-    template <floating_t T>
+    template <floating T>
     constexpr vec2<T>& operator-=(vec2<T>& a, const vec2<T>& b) {
         a.x -= b.x;
         a.y -= b.y;
@@ -64,7 +64,7 @@ namespace arcl {
     }
 
     // Scalar multiplication assignment operator
-    template <floating_t T, arithmetic_t U>
+    template <floating T, arithmetic U>
     constexpr vec2<T>& operator*=(vec2<T>& v, U k) {
         v.x *= k;
         v.y *= k;
@@ -72,7 +72,7 @@ namespace arcl {
     }
 
     // Scalar division assignment operator
-    template <floating_t T, arithmetic_t U>
+    template <floating T, arithmetic U>
     constexpr vec2<T>& operator/=(vec2<T>& v, U k) {
         v.x /= k;
         v.y /= k;
@@ -84,37 +84,37 @@ namespace arcl {
 // =======================================================================================
 
     // Vector addition operator
-    template <floating_t T>
+    template <floating T>
     constexpr vec2<T> operator+(vec2<T> a, const vec2<T>& b) {
         return a += b;
     }
 
     // Vector subtraction operator
-    template <floating_t T>
+    template <floating T>
     constexpr vec2<T> operator-(vec2<T> a, const vec2<T>& b) {
         return a -= b;
     }
 
     // Scalar multiplication operator
-    template <floating_t T, arithmetic_t U>
+    template <floating T, arithmetic U>
     constexpr vec2<T> operator*(vec2<T> v, U k) {
         return v *= k;
     }
 
     // Scalar multiplication operator
-    template <floating_t T, arithmetic_t U>
+    template <floating T, arithmetic U>
     constexpr vec2<T> operator*(U k, vec2<T> v) {
         return v *= k;
     }
 
     // Scalar division operator
-    template <floating_t T, arithmetic_t U>
+    template <floating T, arithmetic U>
     constexpr vec2<T> operator/(vec2<T> v, U k) {
         return v /= k;
     }
     
     // Negation operator
-    template <floating_t T>
+    template <floating T>
     constexpr vec2<T> operator-(const vec2<T>& v) {
         return { -v.x, -v.y };
     }
@@ -124,13 +124,13 @@ namespace arcl {
 // =======================================================================================
 
     // Equality operator
-    template <floating_t T>
+    template <floating T>
     constexpr bool operator==(const vec2<T>& a, const vec2<T>& b) {
         return a.x == b.x && a.y == b.y;
     }
 
     // Inequality operator
-    template <floating_t T>
+    template <floating T>
     constexpr bool operator!=(const vec2<T>& a, const vec2<T>& b) {
         return !(a == b);
     }
@@ -144,7 +144,7 @@ namespace arcl {
     /// </summary>
     /// <param name="v">The vector.</param>
     /// <returns>The magnitude of the vector.</returns>
-    template <floating_t T>
+    template <floating T>
     T magnitude(const vec2<T>& v) {
         return std::sqrt(magnitude2(v));
     }
@@ -154,7 +154,7 @@ namespace arcl {
     /// </summary>
     /// <param name="v">The vector.</param>
     /// <returns>The magnitude squared of the vector.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr T magnitude2(const vec2<T>& v) {
         return dot(v, v);
     }
@@ -164,7 +164,7 @@ namespace arcl {
     /// </summary>
     /// <param name="v">The vector.</param>
     /// <returns>A unit vector in the direction of the vector.</returns>
-    template <floating_t T>
+    template <floating T>
     vec2<T> normalize(const vec2<T>& v) {
         return v / magnitude(v);
     }
@@ -175,7 +175,7 @@ namespace arcl {
     /// <param name="a">The first vector.</param>
     /// <param name="b">The second vector.</param>
     /// <returns>The dot product.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr T dot(const vec2<T>& a, const vec2<T>& b) {
         return a.x * b.x + a.y * b.y;
     }
@@ -186,7 +186,7 @@ namespace arcl {
     /// <param name="a">The first vector.</param>
     /// <param name="b">The second vector.</param>
     /// <returns>The cross product.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr T cross(const vec2<T>& a, const vec2<T>& b) {
         return a.x * b.y - a.y * b.x;
     }
@@ -197,7 +197,7 @@ namespace arcl {
     /// <param name="a">The first vector.</param>
     /// <param name="b">The second vector.</param>
     /// <returns>The distance.</returns>
-    template <floating_t T>
+    template <floating T>
     T distance(const vec2<T>& a, const vec2<T>& b) {
         return magnitude(a - b);
     }
@@ -208,7 +208,7 @@ namespace arcl {
     /// <param name="a">The first vector.</param>
     /// <param name="b">The second vector.</param>
     /// <returns>The distance squared.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr T distance2(const vec2<T>& a, const vec2<T>& b) {
         return magnitude2(a - b);
     }
@@ -222,7 +222,7 @@ namespace arcl {
     /// </summary>
     /// <param name="v">The vector.</param>
     /// <returns>The casted vector.</returns>
-    template <floating_t T, floating_t U>
+    template <floating T, floating U>
     constexpr vec2<T> vec2_cast(const vec2<U>& v) {
         return { (T)v.x, (T)v.y };
     }

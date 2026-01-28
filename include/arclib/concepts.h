@@ -29,15 +29,20 @@
 
 namespace arcl {
 
-    template <typename T>
-    concept integral_t = std::integral<T>;
+// =======================================================================================
+// ARITHMETIC CONCEPTS
+// =======================================================================================
 
     template <typename T>
-    concept floating_t = std::floating_point<T>;
+    concept integral = std::integral<T>;
 
     template <typename T>
-    concept arithmetic_t = integral_t<T> || floating_t<T>;
+    concept floating = std::floating_point<T>;
+
+    template <typename T>
+    concept arithmetic = integral<T> || floating<T>;
 
 }
 
+// =======================================================================================
 #endif
