@@ -49,11 +49,21 @@ namespace arcl {
     }
 
     /// <summary>
+    /// Fills a block of memory with a bit value.
+    /// </summary>
+    /// <param name="dst">A pointer to the beginning of the destination block.</param>
+    /// <param name="val">The value to set the bits to.</param>
+    /// <param name="size">The number of bytes to set.</param>
+    void memfill(void* dst, bool val, uint64 size) {
+        std::memset(dst, val, size);
+    }
+
+    /// <summary>
     /// Performs a bitwise copy of the specified number of bytes from one block of memory
     /// to another.
     /// </summary>
-    /// <param name="dst">The destination block.</param>
-    /// <param name="src">The source block.</param>
+    /// <param name="dst">A pointer to the beginning of the destination block.</param>
+    /// <param name="src">A pointer to the beginning of the source block.</param>
     /// <param name="size">The number of bytes to copy.</param>
     void memcopy(void* dst, const void* src, uint64 size) {
         std::memcpy(dst, src, size);

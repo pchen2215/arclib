@@ -25,6 +25,7 @@
 #ifndef __ARCLIB_OPTVECTOR_H
 #define __ARCLIB_OPTVECTOR_H
 
+#include "bitfield.h"
 #include "int.h"
 #include "concepts.h"
 #include "memory.h"
@@ -41,17 +42,17 @@ namespace arcl {
     class optvector {
         static constexpr double GROW_FACTOR = 1.5;
         static constexpr uint64 INITIAL_SIZE = 8;
-    public:  // ==================================================================
+    public: // ===================================================================
         // MEMBER TYPES
 
         struct optval {
             T& val;
-            const bool has_val;
+            const bitfield::bitref has_val;
         };
 
         struct const_optval {
             const T& val;
-            const bool has_val;
+            const bitfield::const_bitref has_val;
         };
 
         template <bool Const>
@@ -65,29 +66,25 @@ namespace arcl {
 
         // Default constructor
         optvector():
-            _data(nullptr), _mask(nullptr), _alloc(0), _size(0) { }
+            _data(nullptr), _alloc(0), _size(0) { }
 
         // Copy constructor
         optvector(const optvector& ov):
-            _data(memalloc<T>(ov._alloc)),
-            _mask(memalloc<uint64>(ov._alloc)),
-            _alloc(ov._alloc), _size(ov._size) {
+            _data(nullptr), _mask(ov._mask), _alloc(ov._alloc), _size(ov._size) {
             if (ov.empty()) { return; }
 
             // Copy elements
+            _data = memalloc<T>(_alloc);
             for (uint64 i = 0; i < _size; i++) {
-                if (ov[i].has_val) { new (_data + i) T(ov[i].val); }
+                if (_mask[i]) { new (_data + i) T(ov[i].val); }
             }
-
-            // Copy bitmask
-            memcopy(_mask, ov._mask, masklen(_size));
         }
 
         // Move constructor
         optvector(optvector&& ov):
-            _data(ov._data), _mask(ov._mask), _alloc(ov._alloc), _size(ov._size) {
+            _data(ov._data), _mask(std::move(ov._mask)), _alloc(ov._alloc),
+            _size(ov._size) {
             ov._data = nullptr;
-            ov._mask = nullptr;
             ov._alloc = ov._size = 0;
         }
 
@@ -106,7 +103,7 @@ namespace arcl {
         /// <returns>The optval at the specified index.</returns>
         optval at(const uint64 idx) {
             assert(idx < _size);
-            return { _data[idx], maskval(idx) };
+            return { _data[idx], _mask[idx] };
         }
 
         /// <summary>
@@ -116,7 +113,7 @@ namespace arcl {
         /// <returns>The optval at the specified index.</returns>
         const_optval at(const uint64 idx) const {
             assert(idx < _size);
-            return { _data[idx], maskval(idx) };
+            return { _data[idx], _mask[idx] };
         }
 
         // =======================================================================
@@ -216,8 +213,7 @@ namespace arcl {
         /// </summary>
         void clear() {
             for (uint64 i = 0; i < _size; i++) {
-                if (maskval(i)) { _data[i].~T(); }
-                // No need for maskset() since mask values are set by push/emplace
+                if (_mask[idx]) { _data[i].~T(); }
             }
             _size = 0;
         }
@@ -239,9 +235,9 @@ namespace arcl {
             // General case
             assert(pos._idx < _size);
             const uint64 idx = pos._idx;
-            if (maskval(idx)) { _data[idx].~T(); }
+            if (_mask[idx]) { _data[idx].~T(); }
             new (_data + idx) T(val);
-            maskset(idx, true);
+            _mask[idx] = true;
         }
 
         /// <summary>
@@ -261,9 +257,9 @@ namespace arcl {
             // General case
             assert(pos._idx < _size);
             const uint64 idx = pos._idx;
-            if (maskval(idx)) { _data[idx].~T(); }
+            if (_mask[idx]) { _data[idx].~T(); }
             new (_data + idx) T(std::move(val));
-            maskset(idx, true);
+            _mask[idx] = true;
         }
 
         /// <summary>
@@ -284,9 +280,9 @@ namespace arcl {
             // General case
             assert(pos._idx < _size);
             const uint64 idx = pos._idx;
-            if (maskval(idx)) { _data[idx].~T(); }
+            if (_mask[idx]) { _data[idx].~T(); }
             new (_data + idx) T(std::forward<Args>(args)...);
-            maskset(idx, true);
+            _mask[idx] = true;
         }
 
         /// <summary>
@@ -328,7 +324,7 @@ namespace arcl {
             // Insert at final position
             _size++;
             new (_data + _size - 1) T(val);
-            maskset(_size - 1, true);
+            _mask[_size - 1] = true;
         }
 
         /// <summary>
@@ -346,7 +342,7 @@ namespace arcl {
             // Insert at final position
             _size++;
             new (_data + _size - 1) T(std::move(val));
-            maskset(_size - 1, true);
+            _mask[_size - 1] = true;
         }
 
         /// <summary>
@@ -365,7 +361,7 @@ namespace arcl {
             // Emplace at final position
             _size++;
             new (_data + _size - 1) T(std::forward<Args>(args)...);
-            maskset(_size - 1, true);
+            _mask[_size - 1] = true;
         }
 
         /// <summary>
@@ -390,14 +386,13 @@ namespace arcl {
             _alloc = ov._alloc;
             _size = ov._size;
 
-            // Reallocate bitmask
-            _mask = memalloc<uint64>(_alloc);
-            memcopy(_mask, ov._mask, masklen(_size));
+            // Copy bitmask
+            _mask = ov._mask;
 
             // Copy elements
             _data = memalloc<T>(_alloc);
             for (uint64 i = 0; i < _size; i++) {
-                if (maskval(i)) { new (_data + i) T(ov[i].val); }
+                if (_mask[i]) { new (_data + i) T(ov[i].val); }
             }
 
             // Return self
@@ -411,13 +406,12 @@ namespace arcl {
 
             // Transfer ownership
             _data = ov._data;
-            _mask = ov._mask;
+            _mask = std::move(ov._mask);
             _alloc = ov._alloc;
             _size = ov._size;
 
             // Reset state of other optvector
             ov._data = nullptr;
-            ov._mask = nullptr;
             ov._alloc = ov._size = 0;
 
             // Return self
@@ -429,19 +423,19 @@ namespace arcl {
 
         // Subscript operator
         optval operator[](const uint64 idx) {
-            return { _data[idx], maskval(idx) };
+            return { _data[idx], _mask[idx] };
         }
 
         // Subscript operator
         const_optval operator[](const uint64 idx) const {
-            return { _data[idx], maskval(idx) };
+            return { _data[idx], _mask[idx] };
         }
 
     private: // ==================================================================
         // ALLOCATION MANAGEMENT
 
         T* _data;
-        uint64* _mask;
+        bitfield _mask;
         uint64 _alloc;
 
         /// <summary>
@@ -450,12 +444,10 @@ namespace arcl {
         /// </summary>
         void dealloc() {
             for (uint64 i = 0; i < _size; i++) {
-                if (maskval(i)) { _data[i].~T(); }
+                if (_mask[i]) { _data[i].~T(); }
             }
             memfree(_data);
-            memfree(_mask);
             _data = nullptr;
-            _mask = nullptr;
             _alloc = _size = 0;
         }
 
@@ -468,11 +460,12 @@ namespace arcl {
         /// <param name="new_alloc">The new allocation.</param>
         void realloc(const uint64 new_alloc) {
             assert(new_alloc >= _alloc);
+            _mask.resize(new_alloc);
 
             // Allocate new data array and move elements
             T* new_data = memalloc<T>(new_alloc);
             for (uint64 i = 0; i < _size; i++) {
-                if (maskval(i)) {
+                if (_mask[i]) {
                     new (new_data + i) T(std::move(_data[i]));
                     _data[i].~T();
                 }
@@ -480,22 +473,6 @@ namespace arcl {
             memfree(_data);
             _data = new_data;
             _alloc = new_alloc;
-
-            // Reallocate bitmask
-            uint64* new_mask = memalloc<uint64>(masklen(_alloc));
-            memcopy(new_mask, _mask, masklen(_size));
-            memfree(_mask);
-            _mask = new_mask;
-        }
-
-        /// <summary>
-        /// Returns the minimum number of bytes required to store the specified
-        /// number of bits in a uint64 byte array.
-        /// </summary>
-        /// <returns>The minimum number of bytes required to store the specified
-        /// number of bits in a uint64 byte array.</returns>
-        uint64 masklen(const uint64 bits) const {
-            return sizeof(uint64) * ((bits + 63) / 64);
         }
 
         // =======================================================================
@@ -509,32 +486,10 @@ namespace arcl {
         /// <param name="idx">The index of the element to destruct.</param>
         void destruct_elem(const uint64 idx) {
             assert(idx < _size);
-            if (maskval(idx)) {
+            if (_mask[idx]) {
                 _data[idx].~T();
-                maskset(idx, false);
+                _mask[idx] = false;
             }
-        }
-
-        /// <summary>
-        /// Checks whether or not the element at the specified index exists.
-        /// </summary>
-        /// <param name="idx">The index.</param>
-        /// <returns>true if the element at the index exists, else
-        /// false.</returns>
-        bool maskval(const uint64 idx) const {
-            assert(idx < _size);
-            return (_mask[idx >> (uint64)6] >> (idx & (uint64)63)) & (uint64)1;
-        }
-
-        /// <summary>
-        /// Sets a bit in the mask.
-        /// </summary>
-        /// <param name="idx">The index of the bit.</param>
-        /// <param name="val">The value to set to.</param>
-        void maskset(const uint64 idx, const bool val) {
-            assert(idx < _size);
-            val ? _mask[idx >> (uint64)6] |= ((uint64)1 << (idx & (uint64)63))
-                : _mask[idx >> (uint64)6] &= ~((uint64)1 << (idx & (uint64)63));
         }
 
     };
