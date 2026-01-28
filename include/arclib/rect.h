@@ -42,7 +42,7 @@ namespace arcl {
     /// and height values must also be positive. However, the user is free to use it as a
     /// POD type with no invariant.
     /// </summary>
-    template <floating_t T>
+    template <floating T>
     struct rect {
         T x = 0;
         T y = 0;
@@ -62,7 +62,7 @@ namespace arcl {
     /// </summary>
     /// <param name="r">The rectangle.</param>
     /// <returns>The x-value of the left side.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr T rect_left(const rect<T>& r) {
         return r.x;
     }
@@ -72,7 +72,7 @@ namespace arcl {
     /// </summary>
     /// <param name="r">The rectangle.</param>
     /// <returns>The x-value of the right side.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr T rect_right(const rect<T>& r) {
         return r.x + r.w;
     }
@@ -82,7 +82,7 @@ namespace arcl {
     /// </summary>
     /// <param name="r">The rectangle.</param>
     /// <returns>The y-value of the top side.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr T rect_top(const rect<T>& r) {
         return r.y + r.h;
     }
@@ -92,7 +92,7 @@ namespace arcl {
     /// </summary>
     /// <param name="r">The rectangle.</param>
     /// <returns>The y-value of the bottom side.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr T rect_bot(const rect<T>& r) {
         return r.y;
     }
@@ -102,7 +102,7 @@ namespace arcl {
     /// </summary>
     /// <param name="r">The rectangle.</param>
     /// <returns>The center point.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr vec2<T> rect_center(const rect<T>& r) {
         return { r.x + r.w / 2, r.y + r.h / 2 };
     }
@@ -112,7 +112,7 @@ namespace arcl {
     /// </summary>
     /// <param name="r">The rectangle.</param>
     /// <returns>The top-left point.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr vec2<T> rect_topleft(const rect<T>& r) {
         return { rect_left(r), rect_top(r) };
     }
@@ -122,7 +122,7 @@ namespace arcl {
     /// </summary>
     /// <param name="r">The rectangle.</param>
     /// <returns>The top-right point.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr vec2<T> rect_topright(const rect<T>& r) {
         return { rect_right(r), rect_top(r) };
     }
@@ -132,7 +132,7 @@ namespace arcl {
     /// </summary>
     /// <param name="r">The rectangle.</param>
     /// <returns>The bottom-right point.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr vec2<T> rect_botright(const rect<T>& r) {
         return { rect_right(r), rect_bot(r) };
     }
@@ -142,7 +142,7 @@ namespace arcl {
     /// </summary>
     /// <param name="r">The rectangle.</param>
     /// <returns>The bottom-left point.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr vec2<T> rect_botleft(const rect<T>& r) {
         return { rect_left(r), rect_bot(r) };
     }
@@ -153,7 +153,7 @@ namespace arcl {
     /// <param name="r">The rectangle.</param>
     /// <returns>An array containing the quadrants in clockwise order starting from the
     /// top-left quadrant.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr std::array<rect<T>, 4> rect_split4(const rect<T>& r) {
         std::array<rect<T>, 4> result;
         const T half_w = r.w / 2;
@@ -174,7 +174,7 @@ namespace arcl {
     /// <param name="x">The x-value of the point.</param>
     /// <param name="y">The y-value of the point.</param>
     /// <returns>true if the point lies within the rectangle, else false.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr bool contains(const rect<T>& r, T x, T y) {
         return rect_left(r) <= x && x <= rect_right(r) && rect_bot(r) <= y && y <= rect_top(r);
     }
@@ -185,7 +185,7 @@ namespace arcl {
     /// <param name="r">The rectangle.</param>
     /// <param name="pt">The point.</param>
     /// <returns>true if the point lies within the rectangle, else false.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr bool contains(const rect<T>& r, const vec2<T>& pt) {
         return contains(r, pt.x, pt.y);
     }
@@ -197,7 +197,7 @@ namespace arcl {
     /// <param name="in">The inner rectangle.</param>
     /// <returns>true if the inner rectangle lies completely within the outer rectangle,
     /// else false.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr bool contains(const rect<T>& out, const rect<T>& in) {
         return rect_left(out) <= rect_left(in) && rect_right(in) <= rect_right(out)
                && rect_bot(out) <= rect_bot(in) && rect_top(in) <= rect_top(out);
@@ -209,7 +209,7 @@ namespace arcl {
     /// <param name="r1">The first rectangle.</param>
     /// <param name="r2">The second rectangle.</param>
     /// <returns>true if the rectangles intersect, else false.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr bool intersects(const rect<T>& r1, const rect<T>& r2) {
         return rect_left(r1) <= rect_right(r2) && rect_left(r2) <= rect_right(r1)
                && rect_bot(r1) <= rect_top(r2) && rect_bot(r2) <= rect_top(r1);
@@ -224,7 +224,7 @@ namespace arcl {
     /// </summary>
     /// <param name="r">The rect.</param>
     /// <returns>The casted rect.</returns>
-    template <floating_t T, floating_t U>
+    template <floating T, floating U>
     constexpr rect<T> rect_cast(const rect<U>& r) {
         return { (T)r.x, (T)r.y, (T)r.w, (T)r.h };
     }
@@ -235,7 +235,7 @@ namespace arcl {
     /// <param name="a">The first point.</param>
     /// <param name="b">The second point.</param>
     /// <returns>The constructed rect.</returns>
-    template <floating_t T>
+    template <floating T>
     constexpr rect<T> rect_construct(const vec2<T>& a, const vec2<T>& b) {
         const T x = std::min(a.x, b.x);
         const T y = std::min(a.y, b.y);
