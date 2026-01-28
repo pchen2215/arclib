@@ -458,8 +458,9 @@ namespace arcl {
         /// or greater than the current allocation.
         /// </summary>
         /// <param name="new_alloc">The new allocation.</param>
-        void realloc(const uint64 new_alloc) {
+        void realloc(uint64 new_alloc) {
             assert(new_alloc >= _alloc);
+            new_alloc = (new_alloc + 7) & ~7;
             _mask.resize(new_alloc);
 
             // Allocate new data array and move elements
