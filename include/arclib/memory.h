@@ -31,9 +31,9 @@
 
 namespace arcl {
 
-    // =======================================================================================
-    // MEMORY MANAGEMENT FUNCTIONS
-    // =======================================================================================
+// =======================================================================================
+// MEMORY MANAGEMENT FUNCTIONS
+// =======================================================================================
 
     /// <summary>
     /// Allocates an uninitialized block of memory of sufficient byte length to store the
@@ -49,8 +49,8 @@ namespace arcl {
     }
 
     /// <summary>
-    /// Performs a bitwise copy of the specified number of bytes from one block of memory to
-    /// another.
+    /// Performs a bitwise copy of the specified number of bytes from one block of memory
+    /// to another.
     /// </summary>
     /// <param name="dst">The destination block.</param>
     /// <param name="src">The source block.</param>
@@ -60,8 +60,8 @@ namespace arcl {
     }
 
     /// <summary>
-    /// Frees a block of memory allocated by memalloc(). No destructors will be called as a
-    /// result of calling this function.
+    /// Frees a block of memory allocated by memalloc(). No destructors will be called as
+    /// a result of calling this function.
     /// </summary>
     /// <param name="pt">A pointer to the beginning of the allocated block.</param>
     void memfree(void* pt) {
