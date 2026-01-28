@@ -41,7 +41,7 @@ namespace arcl {
     class optvector {
         static constexpr double GROW_FACTOR = 1.5;
         static constexpr uint64 INITIAL_SIZE = 8;
-    public:  // ===================================================================
+    public:  // ==================================================================
         // MEMBER TYPES
 
         struct optval {
@@ -60,7 +60,7 @@ namespace arcl {
         using iterator = basic_iterator<false>;
         using const_iterator = basic_iterator<true>;
 
-        // ========================================================================
+        // =======================================================================
         // CONSTRUCTION AND DESTRUCTION
 
         // Default constructor
@@ -96,7 +96,7 @@ namespace arcl {
             dealloc();
         }
 
-        // ========================================================================
+        // =======================================================================
         // ELEMENT ACCESS
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace arcl {
             return { _data[idx], maskval(idx) };
         }
 
-        // ========================================================================
+        // =======================================================================
         // ITERATORS
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace arcl {
             return const_iterator(*this, _size);
         }
 
-        // ========================================================================
+        // =======================================================================
         // CAPACITY
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace arcl {
             return _alloc;
         }
 
-        // ========================================================================
+        // =======================================================================
         // MODIFIERS
 
         /// <summary>
@@ -224,8 +224,8 @@ namespace arcl {
 
         /// <summary>
         /// Inserts an element into the container at the specified position. If an
-        /// optval containing a value currently exists at that position, it will be
-        /// destructed and overwritten.
+        /// optval containing a value currently exists at that position, it will
+        /// be destructed and overwritten.
         /// </summary>
         /// <param name="pos">An iterator to the position of insertion.</param>
         /// <param name="val">The value to insert.</param>
@@ -246,8 +246,8 @@ namespace arcl {
 
         /// <summary>
         /// Inserts an element into the container at the specified position. If an
-        /// optval containing a value currently exists at that position, it will be
-        /// destructed and overwritten.
+        /// optval containing a value currently exists at that position, it will
+        /// be destructed and overwritten.
         /// </summary>
         /// <param name="pos">An iterator to the position of insertion.</param>
         /// <param name="val">The value to insert.</param>
@@ -379,7 +379,7 @@ namespace arcl {
         /* TODO: resize() functions which allows resizing of container
                  new values could be null optvals or initialized to something */
 
-        // ========================================================================
+        // =======================================================================
         // ASSIGNMENT OPERATORS
 
         // Copy assignment operator
@@ -424,7 +424,7 @@ namespace arcl {
             return *this;
         }
 
-        // ========================================================================
+        // =======================================================================
         // SUBSCRIPT OPERATOR
 
         // Subscript operator
@@ -437,7 +437,7 @@ namespace arcl {
             return { _data[idx], maskval(idx) };
         }
 
-    private: // ===================================================================
+    private: // ==================================================================
         // ALLOCATION MANAGEMENT
 
         T* _data;
@@ -461,9 +461,9 @@ namespace arcl {
 
         /// <summary>
         /// Reallocates memory to fit the requested number of elements without
-        /// another allocation. Uses move operations if possible on extant items in
-        /// the currently allocated memory. The new allocation must be equal to or
-        /// greater than the current allocation.
+        /// another allocation. Uses move operations if possible on extant items
+        /// in the currently allocated memory. The new allocation must be equal to
+        /// or greater than the current allocation.
         /// </summary>
         /// <param name="new_alloc">The new allocation.</param>
         void realloc(const uint64 new_alloc) {
@@ -498,7 +498,7 @@ namespace arcl {
             return sizeof(uint64) * ((bits + 63) / 64);
         }
 
-        // ========================================================================
+        // =======================================================================
         // ELEMENT MANAGEMENT
 
         uint64 _size;
@@ -519,7 +519,8 @@ namespace arcl {
         /// Checks whether or not the element at the specified index exists.
         /// </summary>
         /// <param name="idx">The index.</param>
-        /// <returns>true if the element at the index exists, else false.</returns>
+        /// <returns>true if the element at the index exists, else
+        /// false.</returns>
         bool maskval(const uint64 idx) const {
             assert(idx < _size);
             return (_mask[idx >> (uint64)6] >> (idx & (uint64)63)) & (uint64)1;
@@ -547,18 +548,18 @@ namespace arcl {
 
     template <typename T>
     template <bool IsConst>
-    class optvector<T>::basic_iterator { // ==========================================
+    class optvector<T>::basic_iterator { // ======================================
         // FRIEND DECLARATIONS
 
         friend class optvector;
 
-        // ========================================================================
+        // =======================================================================
         // PRIVATE MEMBER TYPES
 
-        using optvector_t = std::conditional_t<IsConst, const optvector, optvector>;
+        using optvec_t = std::conditional_t<IsConst, const optvector, optvector>;
         using optval_t = std::conditional_t<IsConst, const_optval, optval>;
 
-    public: // ====================================================================
+    public: // ===================================================================
         // CONSTRUCTION
 
         // Default constructor
@@ -573,12 +574,12 @@ namespace arcl {
             _ov(it._ov), _idx(it._idx) { }
 
         // Value constructor
-        basic_iterator(optvector_t& ov, const uint64 idx):
+        basic_iterator(optvec_t& ov, const uint64 idx):
             _ov(&ov), _idx(idx) {
             OPTVECTOR_IT_STATE_CHECK;
         }
 
-        // ========================================================================
+        // =======================================================================
         // ASSIGNMENT OPERATORS
 
         // Copy assignment operator
@@ -626,7 +627,7 @@ namespace arcl {
             return it;
         }
 
-        // ========================================================================
+        // =======================================================================
         // ARITHMETIC OPERATORS
 
         // Addition operator
@@ -639,7 +640,7 @@ namespace arcl {
             return it -= val;
         }
 
-        // ========================================================================
+        // =======================================================================
         // COMPARISON OPERATORS
 
         // Equality operator
@@ -650,7 +651,7 @@ namespace arcl {
 
         /* TODO: random-access comparison operations */
 
-        // ========================================================================
+        // =======================================================================
         // ACCESS OPERATORS
 
         // Dereference operator
@@ -679,10 +680,10 @@ namespace arcl {
             return &val.val;
         }
 
-    private: // ===================================================================
+    private: // ==================================================================
         // PRIVATE MEMBERS
 
-        optvector_t* _ov;
+        optvec_t* _ov;
         uint64 _idx;
 
     };
