@@ -96,12 +96,15 @@ namespace arcl {
         }
 
         /// <summary>
-        /// Resizes the bitfield to fit the requestd number of bits. Bits added in
-        /// excess of the current allocation will be default-initialized to zero.
+        /// Resizes the bitfield to contain the requested number of bits. Bits
+        /// added in excess of the current allocation will be default-initialized
+        /// to zero.
         /// </summary>
-        /// <param name="bits">The number of bits to allocate.</param>
+        /// <param name="bits">The number of bits to allocate. It must be a
+        /// multiple of 8.</param>
         void resize(const uint64 bits) {
-            const uint64 bytes = (bits + 7) / 8;
+            assert(bits % 8 == 0);
+            const uint64 bytes = bits / 8;
 
             // Handle special case
             if (bytes == 0) {
