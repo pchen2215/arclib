@@ -479,9 +479,10 @@ namespace arcl {
             }
             memfree(_data);
             _data = new_data;
+            _alloc = new_alloc;
 
             // Reallocate bitmask
-            uint64* new_mask = memalloc<uint64>(masklen(new_alloc));
+            uint64* new_mask = memalloc<uint64>(masklen(_alloc));
             memcopy(new_mask, _mask, masklen(_size));
             memfree(_mask);
             _mask = new_mask;
