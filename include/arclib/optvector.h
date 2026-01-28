@@ -46,15 +46,15 @@ namespace arcl {
 
         struct optval {
             T& val;
-            const bool exists;
+            const bool has_val;
         };
 
         struct const_optval {
             const T& val;
-            const bool exists;
+            const bool has_val;
         };
 
-        template <bool IsConst>
+        template <bool Const>
         class basic_iterator;
 
         using iterator = basic_iterator<false>;
@@ -76,7 +76,7 @@ namespace arcl {
 
             // Copy elements
             for (uint64 i = 0; i < _size; i++) {
-                if (ov[i].exists) { new (_data + i) T(ov[i].val); }
+                if (ov[i].has_val) { new (_data + i) T(ov[i].val); }
             }
 
             // Copy bitmask
@@ -547,7 +547,7 @@ namespace arcl {
 #define OPTVECTOR_IT_DEREF_CHECK assert(_idx < _ov->_size)
 
     template <typename T>
-    template <bool IsConst>
+    template <bool Const>
     class optvector<T>::basic_iterator { // ======================================
         // FRIEND DECLARATIONS
 
@@ -556,8 +556,8 @@ namespace arcl {
         // =======================================================================
         // PRIVATE MEMBER TYPES
 
-        using optvec_t = std::conditional_t<IsConst, const optvector, optvector>;
-        using optval_t = std::conditional_t<IsConst, const_optval, optval>;
+        using optvec_t = std::conditional_t<Const, const optvector, optvector>;
+        using optval_t = std::conditional_t<Const, const_optval, optval>;
 
     public: // ===================================================================
         // CONSTRUCTION
@@ -570,7 +570,7 @@ namespace arcl {
         basic_iterator(const basic_iterator&) = default;
 
         // Conversion constructor
-        basic_iterator(const basic_iterator<false>& it) requires (IsConst):
+        basic_iterator(const basic_iterator<false>& it) requires (Const):
             _ov(it._ov), _idx(it._idx) { }
 
         // Value constructor
@@ -655,7 +655,7 @@ namespace arcl {
         // ACCESS OPERATORS
 
         // Dereference operator
-        optval operator*() requires (!IsConst) {
+        optval operator*() requires (!Const) {
             OPTVECTOR_IT_DEREF_CHECK;
             return _ov->at(_idx);
         }
@@ -667,16 +667,16 @@ namespace arcl {
         }
 
         // Arrow operator
-        T* operator->() requires (!IsConst) {
+        T* operator->() requires (!Const) {
             const optval val = **this;
-            assert(val.exists);
+            assert(val.has_val);
             return &val.val;
         }
 
         // Arrow operator
         const T* operator->() const {
             const const_optval val = **this;
-            assert(val.exists);
+            assert(val.has_val);
             return &val.val;
         }
 
