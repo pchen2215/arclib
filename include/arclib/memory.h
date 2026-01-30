@@ -36,46 +36,51 @@ namespace arcl {
 // =======================================================================================
 
     /// <summary>
-    /// Allocates an uninitialized block of memory of sufficient byte length to store the
-    /// requested number of elements of type T. This allocated block must be freed by a
+    /// Allocates an uninitialized block of memory of the requested byte length. The block
+    /// will be aligned to the default system alignment. The allocated block must be freed
+    /// by a matching call to memfree().
+    /// </summary>
+    /// <param name="bytes">The number of bytes.</param>
+    /// <returns>A pointer to the beginning of the allocated block.</returns>
+    void* bytealloc(const uint64 bytes) {
+        assert(bytes != 0);
+        return ::operator new(bytes);
+    }
+
+    /// <summary>
+    /// Allocates an uninitialized block of memory of the requested byte length. The block
+    /// will be aligned to the requested alignment. The allocated block must be freed by a
     /// matching call to memfree().
+    /// </summary>
+    /// <param name="bytes">The number of bytes.</param>
+    /// <param name="align">The alignment in bytes.</param>
+    /// <returns>A pointer to the beginning of the allocated block.</returns>
+    void* bytealloc(const uint64 bytes, const std::align_val_t align) {
+        assert(bytes != 0);
+        return ::operator new(bytes, align);
+    }
+
+    /// <summary>
+    /// Allocates an uninitialized block of memory of sufficient byte length to store the
+    /// requested number of elements of type T contiguously. The block is guaranteed to
+    /// meet the alignment requirements of any type for which alignof is defined. The
+    /// allocated block must be freed by a matching call to memfree().
     /// </summary>
     /// <param name="size">The number of elements.</param>
     /// <returns>A pointer to the beginning of the allocated block.</returns>
     template <typename T>
-    T* memalloc(uint64 size) {
+    T* typealloc(const uint64 size) {
         assert(size != 0);
-        return (T*)::operator new(size * sizeof(T));
+        return (T*)::operator new(size * sizeof(T), alignof(T));
     }
 
     /// <summary>
-    /// Fills a block of memory with a bit value.
-    /// </summary>
-    /// <param name="dst">A pointer to the beginning of the destination block.</param>
-    /// <param name="val">The value to set the bits to.</param>
-    /// <param name="size">The number of bytes to set.</param>
-    void memfill(void* dst, bool val, uint64 size) {
-        std::memset(dst, val, size);
-    }
-
-    /// <summary>
-    /// Performs a bitwise copy of the specified number of bytes from one block of memory
-    /// to another.
-    /// </summary>
-    /// <param name="dst">A pointer to the beginning of the destination block.</param>
-    /// <param name="src">A pointer to the beginning of the source block.</param>
-    /// <param name="size">The number of bytes to copy.</param>
-    void memcopy(void* dst, const void* src, uint64 size) {
-        std::memcpy(dst, src, size);
-    }
-
-    /// <summary>
-    /// Frees a block of memory allocated by memalloc(). No destructors will be called as
-    /// a result of calling this function.
+    /// Frees a block of memory allocated by arclib memory allocation functions. No
+    /// destructors will be called as a result of calling this function.
     /// </summary>
     /// <param name="pt">A pointer to the beginning of the allocated block.</param>
-    void memfree(void* pt) {
-        ::operator delete(pt);
+    void memfree(void* block) {
+        ::operator delete(block);
     }
 
 }

@@ -74,7 +74,7 @@ namespace arcl {
             if (ov.empty()) { return; }
 
             // Copy elements
-            _data = memalloc<T>(_alloc);
+            _data = typealloc<T>(_alloc);
             for (uint64 i = 0; i < _size; i++) {
                 if (_mask[i]) { new (_data + i) T(ov[i].val); }
             }
@@ -390,7 +390,7 @@ namespace arcl {
             _mask = ov._mask;
 
             // Copy elements
-            _data = memalloc<T>(_alloc);
+            _data = typealloc<T>(_alloc);
             for (uint64 i = 0; i < _size; i++) {
                 if (_mask[i]) { new (_data + i) T(ov[i].val); }
             }
@@ -464,7 +464,7 @@ namespace arcl {
             _mask.resize(new_alloc);
 
             // Allocate new data array and move elements
-            T* new_data = memalloc<T>(new_alloc);
+            T* new_data = typealloc<T>(new_alloc);
             for (uint64 i = 0; i < _size; i++) {
                 if (_mask[i]) {
                     new (new_data + i) T(std::move(_data[i]));
