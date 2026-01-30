@@ -85,11 +85,11 @@ namespace arcl {
         // CAPACITY
 
         /// <summary>
-        /// Returns the number of bytes contained in the bitfield.
+        /// Returns the number of bits contained in the bitfield.
         /// </summary>
-        /// <returns>The number of bytes.</returns>
+        /// <returns>The number of bits.</returns>
         uint64 size() const {
-            return _alloc;
+            return _alloc * 8;
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace arcl {
     private: // ==================================================================
         // PRIVATE MEMBERS
 
-        uint8* _field;
+        byte* _field;
         uint64 _alloc;
 
         /// <summary>
@@ -155,12 +155,12 @@ namespace arcl {
             dst._alloc = src._alloc;
 
             // Copy allocated resources
-            if (src._field != nullptr) {
-                dst._field = (uint8*)bytealloc(dst._alloc);
-                std::memcpy(dst._field, src._field, dst._alloc);
-            } else {
+            if (src._field == nullptr) {
                 assert(dst._alloc == 0);
                 dst._field = nullptr;
+            } else {
+                dst._field = bytealloc(dst._alloc);
+                std::memcpy(dst._field, src._field, dst._alloc);
             }
         }
 
@@ -201,7 +201,7 @@ namespace arcl {
             }
 
             // Make new allocation and copy
-            uint8* new_field = (uint8*)bytealloc(new_alloc); {
+            byte* new_field = bytealloc(new_alloc); {
                 std::memcpy(new_field, _field, std::min(_alloc, new_alloc));
                 if (new_alloc > _alloc) {
                     std::memset(new_field + _alloc, 0, new_alloc - _alloc);
@@ -215,9 +215,9 @@ namespace arcl {
         }
 
         /// <summary>
-        /// Frees all heap memory allocations owned by this object. Upon
-        /// returning, this object will have no ownership responsibility over any
-        /// heap memory allocations.
+        /// Frees all heap memory allocations this object is responsible for. Upon
+        /// returning, this object will have no responsibility over any heap
+        /// memory allocations.
         /// </summary>
         void dealloc() {
             memfree(_field);
@@ -235,43 +235,43 @@ namespace arcl {
         // FRIEND AND MEMBER TYPE DECLARATIONS
 
         friend class bitfield;
-        using byte_t = std::conditional_t<Const, const uint8, uint8>;
+        using byte_t = std::conditional_t<Const, const byte, byte>;
 
     public: // ===================================================================
         // CONSTRUCTION
 
         // Delete default constructor
-        constexpr basic_bitref() = delete;
+        basic_bitref() = delete;
 
         // Copy constructor
-        constexpr basic_bitref(const basic_bitref&) = default;
+        basic_bitref(const basic_bitref&) = default;
 
         // Conversion constructor
-        constexpr basic_bitref(const basic_bitref<false>& b) requires (Const):
+        basic_bitref(const basic_bitref<false>& b) requires (Const):
             _byte(b._byte), _mask(b._mask) { }
 
         // =======================================================================
         // OPERATORS
 
         // Copy assignment operator
-        constexpr basic_bitref& operator=(const basic_bitref& b)
+        basic_bitref& operator=(const basic_bitref& b)
             requires (!Const) {
             return *this = (bool)b;
         }
 
         // Assignment operator
-        constexpr bitref& operator=(bool b) requires (!Const) {
+        bitref& operator=(bool b) requires (!Const) {
             b ? _byte |= _mask : _byte &= ~_mask;
             return *this;
         }
 
         // Logical NOT operator
-        constexpr bool operator!() const {
+        bool operator!() const {
             return !(bool)(*this);
         }
 
         // Bool cast operator
-        constexpr operator bool() const {
+        operator bool() const {
             return (_byte & _mask) != 0;
         }
 
@@ -279,7 +279,7 @@ namespace arcl {
         // PRIVATE MEMBERS
 
         // Private value constructor
-        constexpr basic_bitref(byte_t& byte, const uint8 idx):
+        basic_bitref(byte_t& byte, const uint8 idx):
             _byte(byte), _mask(1 << idx) { }
 
         // Reference to bit

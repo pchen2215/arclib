@@ -28,6 +28,8 @@
 #include "int.h"
 #include <cassert>
 #include <cstring>
+#include <new>
+#include <type_traits>
 
 namespace arcl {
 
@@ -36,51 +38,56 @@ namespace arcl {
 // =======================================================================================
 
     /// <summary>
-    /// Allocates an uninitialized block of memory of the requested byte length. The block
-    /// will be aligned to the default system alignment. The allocated block must be freed
-    /// by a matching call to memfree().
+    /// Allocates an uninitialized block of memory of the requested byte length. The
+    /// allocated block should only be freed by a matching call to memfree().
     /// </summary>
     /// <param name="bytes">The number of bytes.</param>
     /// <returns>A pointer to the beginning of the allocated block.</returns>
-    void* bytealloc(const uint64 bytes) {
-        assert(bytes != 0);
-        return ::operator new(bytes);
-    }
-
-    /// <summary>
-    /// Allocates an uninitialized block of memory of the requested byte length. The block
-    /// will be aligned to the requested alignment. The allocated block must be freed by a
-    /// matching call to memfree().
-    /// </summary>
-    /// <param name="bytes">The number of bytes.</param>
-    /// <param name="align">The alignment in bytes.</param>
-    /// <returns>A pointer to the beginning of the allocated block.</returns>
-    void* bytealloc(const uint64 bytes, const std::align_val_t align) {
-        assert(bytes != 0);
-        return ::operator new(bytes, align);
+    byte* bytealloc(const uint64 bytes) noexcept {
+        return typealloc<byte>(bytes);
     }
 
     /// <summary>
     /// Allocates an uninitialized block of memory of sufficient byte length to store the
-    /// requested number of elements of type T contiguously. The block is guaranteed to
-    /// meet the alignment requirements of any type for which alignof is defined. The
-    /// allocated block must be freed by a matching call to memfree().
+    /// requested number of elements of type T contiguously. The block will meet the
+    /// alignment requirements of any type for which alignas is defined. The allocated
+    /// block should only be freed by a matching call to memfree().
     /// </summary>
     /// <param name="size">The number of elements.</param>
     /// <returns>A pointer to the beginning of the allocated block.</returns>
     template <typename T>
-    T* typealloc(const uint64 size) {
+    T* typealloc(const uint64 size) noexcept {
         assert(size != 0);
-        return (T*)::operator new(size * sizeof(T), alignof(T));
+        const uint64 allocation = size * sizeof(T);
+        const std::align_val_t alignment = alignof(T);
+        return (T*)::operator new(allocation, alignment, std::nothrow);
     }
 
     /// <summary>
-    /// Frees a block of memory allocated by arclib memory allocation functions. No
-    /// destructors will be called as a result of calling this function.
+    /// Frees a block of memory allocated by arclib memory allocation functions. The
+    /// pointer must have a static type exactly equal to the return value of the
+    /// allocation function that allocated it.
     /// </summary>
-    /// <param name="pt">A pointer to the beginning of the allocated block.</param>
-    void memfree(void* block) {
-        ::operator delete(block);
+    /// <param name="block">A pointer to the beginning of the allocated block.</param>
+    template <typename T>
+    void memfree(T* block) noexcept requires (!std::is_void_v<T>) {
+        const std::align_val_t alignment = alignof(T);
+        return ::operator delete(block, alignment);
+    }
+
+    /// <summary>
+    /// Frees a block of memory of specific size allocated by arclib memory allocation
+    /// functions. The provided size must be exactly equal to the size that was
+    /// requested when the block was allocated. The pointer must have a static type
+    /// exactly equal to the return value of the allocation function that allocated it.
+    /// </summary>
+    /// <param name="block">A pointer to the beginning of the allocated block.</param>
+    /// <param name="size">The size of the allocation.</param>
+    template <typename T>
+    void memfree(T* block, const uint64 size) noexcept requires (!std::is_void_v<T>) {
+        const uint64 allocation = size * sizeof(T);
+        const std::align_val_t alignment = alignof(T);
+        return ::operator delete(block, allocation, alignment);
     }
 
 }

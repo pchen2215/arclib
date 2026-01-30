@@ -25,6 +25,7 @@
 #ifndef __ARCLIB_CONTAINERS_H
 #define __ARCLIB_CONTAINERS_H
 
+#include "bitfield.h"
 #include "optvector.h"
 
 #endif

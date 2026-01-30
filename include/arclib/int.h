@@ -39,6 +39,8 @@ namespace arcl {
     using uint32 = std::uint32_t; // 32-bit unsigned int
     using uint64 = std::uint64_t; // 64-bit unsigned int
 
+    using byte = uint8;
+
 }
 
 #endif
