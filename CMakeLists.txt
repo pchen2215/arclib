@@ -8,7 +8,7 @@ file(GLOB_RECURSE LIB_HEADERS "include/arclib/*.h")
 file(GLOB_RECURSE LIB_SOURCES "source/*.cpp")
 add_library(arclib ${LIB_SOURCES} ${LIB_HEADERS})
 
-target_include_directories(arclib PUBLIC 
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
+target_include_directories(arclib PUBLIC include/)
+
+enable_testing()
+add_subdirectory(tests)
