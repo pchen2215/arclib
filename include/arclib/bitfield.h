@@ -198,11 +198,10 @@ namespace arcl {
             }
 
             // Make new allocation and copy
-            byte* new_field = bytealloc(new_alloc); {
-                std::memcpy(new_field, _field, std::min(_alloc, new_alloc));
-                if (new_alloc > _alloc) {
-                    std::memset(new_field + _alloc, 0, new_alloc - _alloc);
-                }
+            byte* new_field = bytealloc(new_alloc);
+            std::memcpy(new_field, _field, std::min(_alloc, new_alloc));
+            if (new_alloc > _alloc) {
+                std::memset(new_field + _alloc, 0, new_alloc - _alloc);
             }
 
             // Replace allocation
