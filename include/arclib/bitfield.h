@@ -209,7 +209,7 @@ namespace arcl {
             }
 
             // Replace allocation
-            memfree(_field);
+            memfree(_field, _alloc);
             _field = new_field;
             _alloc = new_alloc;
         }
@@ -220,7 +220,7 @@ namespace arcl {
         /// memory allocations.
         /// </summary>
         void dealloc() {
-            memfree(_field);
+            memfree(_field, _alloc);
             _alloc = 0;
         }
 

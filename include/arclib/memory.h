@@ -38,16 +38,6 @@ namespace arcl {
 // =======================================================================================
 
     /// <summary>
-    /// Allocates an uninitialized block of memory of the requested byte length. The
-    /// allocated block should only be freed by a matching call to memfree().
-    /// </summary>
-    /// <param name="bytes">The number of bytes.</param>
-    /// <returns>A pointer to the beginning of the allocated block.</returns>
-    byte* bytealloc(const uint64 bytes) noexcept {
-        return typealloc<byte>(bytes);
-    }
-
-    /// <summary>
     /// Allocates an uninitialized block of memory of sufficient byte length to store the
     /// requested number of elements of type T contiguously. The block will meet the
     /// alignment requirements of any type for which alignas is defined. The allocated
@@ -59,8 +49,18 @@ namespace arcl {
     T* typealloc(const uint64 size) noexcept {
         assert(size != 0);
         const uint64 allocation = size * sizeof(T);
-        const std::align_val_t alignment = alignof(T);
+        const std::align_val_t alignment = (std::align_val_t)alignof(T);
         return (T*)::operator new(allocation, alignment, std::nothrow);
+    }
+
+    /// <summary>
+    /// Allocates an uninitialized block of memory of the requested byte length. The
+    /// allocated block should only be freed by a matching call to memfree().
+    /// </summary>
+    /// <param name="bytes">The number of bytes.</param>
+    /// <returns>A pointer to the beginning of the allocated block.</returns>
+    byte* bytealloc(const uint64 bytes) noexcept {
+        return typealloc<byte>(bytes);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ namespace arcl {
     /// <param name="block">A pointer to the beginning of the allocated block.</param>
     template <typename T>
     void memfree(T* block) noexcept requires (!std::is_void_v<T>) {
-        const std::align_val_t alignment = alignof(T);
+        const std::align_val_t alignment = (std::align_val_t)alignof(T);
         return ::operator delete(block, alignment);
     }
 
@@ -86,7 +86,7 @@ namespace arcl {
     template <typename T>
     void memfree(T* block, const uint64 size) noexcept requires (!std::is_void_v<T>) {
         const uint64 allocation = size * sizeof(T);
-        const std::align_val_t alignment = alignof(T);
+        const std::align_val_t alignment = (std::align_val_t)alignof(T);
         return ::operator delete(block, allocation, alignment);
     }
 
