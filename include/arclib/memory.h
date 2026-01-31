@@ -90,6 +90,31 @@ namespace arcl {
         return ::operator delete(block, allocation, alignment);
     }
 
+// =======================================================================================
+// OBJECT LIFETIME FUNCTIONS
+// =======================================================================================
+
+    /// <summary>
+    /// Constructs an object of type T in-place at the specified memory location.
+    /// </summary>
+    /// <param name="loc">A pointer to the memory location to construct at.</param>
+    /// <param name="...args">The constructor arguments.</param>
+    template <typename T, typename... Args>
+    void pconstruct(T* loc, Args&&... args) {
+        assert(loc != nullptr);
+        new (loc) T(std::forward<Args>(args)...);
+    }
+
+    /// <summary>
+    /// Destructs an object of type T in-place at the specified memory location.
+    /// </summary>
+    /// <param name="loc">A pointer to the memory location to destruct at.</param>
+    template <typename T>
+    void pdestruct(T* loc) {
+        assert(loc != nullptr);
+        loc->~T();
+    }
+
 }
 
 // =======================================================================================
