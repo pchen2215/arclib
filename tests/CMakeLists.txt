@@ -1,5 +1,5 @@
 # Collect test source files
-file(GLOB_RECURSE TEST_SOURCES "*.cpp")
+file(GLOB_RECURSE TEST_SOURCES "source/*.cpp")
 
 # Add all tests
 foreach(test_source ${TEST_SOURCES})
