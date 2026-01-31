@@ -8,14 +8,14 @@ int main(int, char**) {
         bitfield bf1;
         verify(bf1.size() == 0);
 
-        bitfield bf2(1);
+        bitfield bf2(8);
         verify(bf2.size() == 8);
         for (uint64 i = 0; i < bf2.size(); i++) { verify(bf2[i] == false); }
 
     } catch (...) { return EXIT_FAILURE; }
     
     try { // Test bit manipulation
-        bitfield bf(1);
+        bitfield bf(8);
 
         bf[0] = true;
         bf[2] = true;
@@ -52,18 +52,18 @@ int main(int, char**) {
     try { // Test resizing functionality
         bitfield bf1;
 
-        for (uint64 i = 0; i < 1024; i++) {
+        for (uint64 i = 0; i < 8192; i++) {
             bf1.resize(i);
-            verify(bf1.size() == i * 8);
+            verify(bf1.size() == i);
         }
 
-        bitfield bf2(2);
+        bitfield bf2(16);
         for (uint64 i = 0; i < 16; i++) { bf2[i] = true; }
 
-        bf2.resize(1);
+        bf2.resize(8);
         for (uint64 i = 0; i < 8; i++) { verify(bf2[i] == true); }
 
-        bf2.resize(2);
+        bf2.resize(16);
         for (uint64 i = 0; i < 8; i++) { verify(bf2[i] == true); }
         for (uint64 i = 8; i < 16; i++) { verify(bf2[i] == false); }
 

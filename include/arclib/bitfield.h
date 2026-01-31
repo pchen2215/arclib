@@ -52,28 +52,27 @@ namespace arcl {
 
         // Default constructor
         bitfield():
-            _field(nullptr), _alloc(0) { }
+            _field(nullptr), _alloc(0), _size(0) { }
 
         // Copy constructor
         bitfield(const bitfield& b):
-            _field(nullptr), _alloc(0) {
+            _field(nullptr), _alloc(0), _size(0) {
             copy_into(*this, b);
         }
 
         // Move constructor
         bitfield(bitfield&& b):
-            _field(nullptr), _alloc(0) {
+            _field(nullptr), _alloc(0), _size(0) {
             move_into(*this, std::forward<bitfield>(b));
         }
 
         /// <summary>
         /// Value constructor.
         /// </summary>
-        /// <param name="bytes">The number of bytes to allocate to the
-        /// bitfield.</param>
-        bitfield(const uint64 bytes):
-            _field(nullptr), _alloc(0) {
-            realloc(bytes);
+        /// <param name="bits">The number of bits in the bitfield.</param>
+        bitfield(const uint64 bits):
+            _field(nullptr), _alloc(0), _size(0) {
+            realloc(bits);
         }
 
         // Destructor
@@ -89,17 +88,17 @@ namespace arcl {
         /// </summary>
         /// <returns>The number of bits.</returns>
         uint64 size() const {
-            return _alloc * 8;
+            return _size;
         }
 
         /// <summary>
-        /// Resizes the bitfield to contain the requested number of bytes. Bits
+        /// Resizes the bitfield to contain the requested number of bits. Bits
         /// added in excess of the current allocation will be default-initialized
         /// to zero.
         /// </summary>
-        /// <param name="bits">The number of bytes to allocate.</param>
-        void resize(const uint64 bytes) {
-            realloc(bytes);
+        /// <param name="bits">The number of bits to resize to.</param>
+        void resize(const uint64 bits) {
+            realloc(bits);
         }
 
         // =======================================================================
@@ -135,6 +134,7 @@ namespace arcl {
 
         byte* _field;
         uint64 _alloc;
+        uint64 _size;
 
         /// <summary>
         /// Performs a value copy of one object of the type into another. The
@@ -150,10 +150,12 @@ namespace arcl {
 
             // Copy trivial members
             dst._alloc = src._alloc;
+            dst._size = src._size;
 
             // Copy allocated resources
             if (src._field == nullptr) {
                 assert(dst._alloc == 0);
+                assert(dst._size == 0);
                 dst._field = nullptr;
             } else {
                 dst._field = bytealloc(dst._alloc);
@@ -177,37 +179,42 @@ namespace arcl {
 
             // Copy trivial members
             dst._alloc = src._alloc;
-            src._alloc = 0;
+            dst._size = src._size;
+            src._alloc = src._size = 0;
 
             // Move allocated resources
             dst._field = src._field;
             src._field = nullptr;
-            assert(dst._field == nullptr ? dst._alloc == 0 : true);
         }
 
         /// <summary>
         /// Reallocates any heap memory allocations owned by this object and
         /// performs any necessary copies to preserve object invariance.
         /// </summary>
-        /// <param name="new_alloc">The size of the reallocation in bytes.</param>
-        void realloc(const uint64 new_alloc) {
+        /// <param name="bits">The number of bits to fit in the new
+        /// allocation.</param>
+        void realloc(const uint64 bits) {
             // Handle realloc to zero
-            if (new_alloc == 0) {
+            if (bits == 0) {
                 dealloc();
                 return;
             }
 
+            // Calculate minimum number of bytes to fit the bits
+            const uint64 bytes = (bits + 7) / 8;
+
             // Make new allocation and copy
-            byte* new_field = bytealloc(new_alloc);
-            std::memcpy(new_field, _field, std::min(_alloc, new_alloc));
-            if (new_alloc > _alloc) {
-                std::memset(new_field + _alloc, 0, new_alloc - _alloc);
+            byte* new_field = bytealloc(bytes);
+            std::memcpy(new_field, _field, std::min(_alloc, bytes));
+            if (bytes > _alloc) {
+                std::memset(new_field + _alloc, 0, bytes - _alloc);
             }
 
             // Replace allocation
             memfree(_field, _alloc);
             _field = new_field;
-            _alloc = new_alloc;
+            _alloc = bytes;
+            _size = bits;
         }
 
         /// <summary>
@@ -217,7 +224,7 @@ namespace arcl {
         /// </summary>
         void dealloc() {
             memfree(_field, _alloc);
-            _alloc = 0;
+            _alloc = _size = 0;
         }
 
     };
@@ -289,12 +296,12 @@ namespace arcl {
 // =======================================================================================
 
     bitfield::bitref bitfield::operator[](const uint64 bit) {
-        assert(bit < _alloc * 8);
+        assert(bit < _size);
         return bitref(_field[bit / 8], bit % 8);
     }
 
     bitfield::const_bitref bitfield::operator[](const uint64 bit) const {
-        assert(bit < _alloc * 8);
+        assert(bit < _size);
         return const_bitref(_field[bit / 8], bit % 8);
     }
 
