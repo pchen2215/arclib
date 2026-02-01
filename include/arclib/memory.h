@@ -54,16 +54,6 @@ namespace arcl {
     }
 
     /// <summary>
-    /// Allocates an uninitialized block of memory of the requested byte length. The
-    /// allocated block should only be freed by a matching call to memfree().
-    /// </summary>
-    /// <param name="bytes">The number of bytes.</param>
-    /// <returns>A pointer to the beginning of the allocated block.</returns>
-    byte* bytealloc(const uint64 bytes) noexcept {
-        return typealloc<byte>(bytes);
-    }
-
-    /// <summary>
     /// Frees a block of memory allocated by arclib memory allocation functions. The
     /// pointer must have a static type exactly equal to the return value of the
     /// allocation function that allocated it.
