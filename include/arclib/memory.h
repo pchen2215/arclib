@@ -27,7 +27,6 @@
 
 #include "int.h"
 #include <cassert>
-#include <cstring>
 #include <new>
 #include <type_traits>
 
@@ -46,7 +45,7 @@ namespace arcl {
     /// <param name="size">The number of elements.</param>
     /// <returns>A pointer to the beginning of the allocated block.</returns>
     template <typename T>
-    T* typealloc(const uint64 size) noexcept {
+    T* typealloc(const uint64 size) noexcept requires (!std::is_void_v<T>) {
         assert(size != 0);
         const uint64 allocation = size * sizeof(T);
         const std::align_val_t alignment = (std::align_val_t)alignof(T);
@@ -56,7 +55,7 @@ namespace arcl {
     /// <summary>
     /// Frees a block of memory allocated by arclib memory allocation functions. The
     /// pointer must have a static type exactly equal to the return value of the
-    /// allocation function that allocated it.
+    /// function that allocated the block.
     /// </summary>
     /// <param name="block">A pointer to the beginning of the allocated block.</param>
     template <typename T>
@@ -69,7 +68,7 @@ namespace arcl {
     /// Frees a block of memory of specific size allocated by arclib memory allocation
     /// functions. The provided size must be exactly equal to the size that was
     /// requested when the block was allocated. The pointer must have a static type
-    /// exactly equal to the return value of the allocation function that allocated it.
+    /// exactly equal to the return value of the function that allocated the block.
     /// </summary>
     /// <param name="block">A pointer to the beginning of the allocated block.</param>
     /// <param name="size">The size of the allocation.</param>
